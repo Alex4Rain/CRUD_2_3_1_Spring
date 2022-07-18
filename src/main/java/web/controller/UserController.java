@@ -1,43 +1,48 @@
 package web.controller;
 
-import db.model.User;
-import db.service.UserService;
+import org.springframework.web.bind.annotation.*;
+import web.model.User;
+import web.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
 
 @Controller
+@RequestMapping("/")
 public class UserController {
 
-    private UserService service;
+    private final UserService service;
 
     @Autowired
     public UserController(UserService service) {
         this.service = service;
     }
 
-    @GetMapping(value = "/")
+    @GetMapping()
     public String index(ModelMap model) {
         model.addAttribute("users", service.listUsers());
         model.addAttribute("user", new User());
         return "users/index";
     }
 
-    @PostMapping(value = "/")
+    @PostMapping()
     public String add(User user) {
         service.add(user);
         return "redirect:/";
     }
 
-    @PostMapping(value = "/remove")
+    @DeleteMapping("/remove")
     public String remove(User user) {
         service.removeUser(user);
         return "redirect:/";
     }
-    @PostMapping(value = "/edit")
-    public String edit(User user) {
+    @GetMapping("/edit/{id}")
+    public String edit(ModelMap model, @PathVariable("id") long id) {
+        model.addAttribute("user", service.getUser(id));
+        return "users/edit";
+    }
+    @PatchMapping("/update/{id}")
+    public String update(User user) {
         service.editUser(user);
         return "redirect:/";
     }

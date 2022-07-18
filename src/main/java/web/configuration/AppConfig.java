@@ -29,7 +29,7 @@ import java.util.Properties;
 @EnableWebMvc
 @EnableTransactionManagement
 @PropertySource("classpath:db.properties")
-@ComponentScan({"web", "db"})
+@ComponentScan("web")
 public class AppConfig implements WebMvcConfigurer {
 
     private final ApplicationContext applicationContext;
@@ -44,6 +44,7 @@ public class AppConfig implements WebMvcConfigurer {
     @Bean
     public SpringResourceTemplateResolver templateResolver() {
         SpringResourceTemplateResolver templateResolver = new SpringResourceTemplateResolver();
+        templateResolver.setCharacterEncoding("UTF-8");
         templateResolver.setApplicationContext(applicationContext);
         templateResolver.setPrefix("/WEB-INF/");
         templateResolver.setSuffix(".html");
@@ -63,6 +64,9 @@ public class AppConfig implements WebMvcConfigurer {
     public void configureViewResolvers(ViewResolverRegistry registry) {
         ThymeleafViewResolver resolver = new ThymeleafViewResolver();
         resolver.setTemplateEngine(templateEngine());
+        resolver.setCharacterEncoding("UTF-8");
+        resolver.setForceContentType(true);
+        resolver.setContentType("text/html; charset=UTF-8");
         registry.viewResolver(resolver);
     }
 
@@ -87,7 +91,7 @@ public class AppConfig implements WebMvcConfigurer {
     public LocalContainerEntityManagerFactoryBean entityManagerFactory() {
         LocalContainerEntityManagerFactoryBean entityManagerFactoryBean = new LocalContainerEntityManagerFactoryBean();
         entityManagerFactoryBean.setDataSource(getDataSource());
-        entityManagerFactoryBean.setPackagesToScan("db.model");
+        entityManagerFactoryBean.setPackagesToScan("web.model");
         JpaVendorAdapter vendorAdapter = new HibernateJpaVendorAdapter();
         entityManagerFactoryBean.setJpaVendorAdapter(vendorAdapter);
         entityManagerFactoryBean.setJpaProperties(additionalProperties());
